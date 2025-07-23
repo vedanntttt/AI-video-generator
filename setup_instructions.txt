@@ -1,0 +1,115 @@
+AI VIDEO GENERATOR - COMPLETE SETUP INSTRUCTIONS
+================================================
+
+STEP 1: SYSTEM REQUIREMENTS
+---------------------------
+- Python 3.8 or higher
+- FFmpeg (for video processing)
+- Internet connection
+
+STEP 2: INSTALL FFMPEG
+----------------------
+Ubuntu/Debian:
+    sudo apt update && sudo apt install ffmpeg
+
+macOS:
+    brew install ffmpeg
+
+Windows:
+    Download from https://ffmpeg.org/download.html
+    Add to PATH environment variable
+
+STEP 3: PROJECT SETUP
+--------------------
+# Create project directory
+mkdir ai-video-generator
+cd ai-video-generator
+
+# Copy all the project files to this directory
+# (app.py, config.py, utils.py, demo_scripts.py, requirements.txt, etc.)
+
+STEP 4: PYTHON ENVIRONMENT
+-------------------------
+# Create virtual environment
+python3 -m venv venv
+
+# Activate virtual environment
+# Linux/Mac:
+source venv/bin/activate
+# Windows:
+venv\Scripts\activate
+
+# Install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+
+STEP 5: OPTIONAL API KEYS
+------------------------
+# Create .env file (optional)
+cp .env.example .env
+# Edit .env and add:
+# ELEVENLABS_API_KEY=your_key_here (optional for premium voices)
+
+STEP 6: START APPLICATION
+------------------------
+# Method 1: Use startup script
+chmod +x start.sh
+./start.sh
+
+# Method 2: Direct command
+streamlit run app.py
+
+# Method 3: Python launcher
+python run.py
+
+STEP 7: ACCESS APPLICATION
+-------------------------
+Open browser and go to: http://localhost:8501
+
+STEP 8: CREATE YOUR FIRST VIDEO
+-------------------------------
+1. Click "🎬 Try Demo Scripts"
+2. Select "Space Adventure"
+3. Click "📋 Load Demo Script"
+4. Click "🎬 Generate Video"
+5. Wait 2-5 minutes
+6. Download your video!
+
+TROUBLESHOOTING
+--------------
+If localhost doesn't work:
+- Try http://127.0.0.1:8501
+- Check firewall settings
+- Try different browser
+- Restart the application
+
+If FFmpeg not found:
+- Reinstall FFmpeg
+- Check PATH environment variable
+- Restart terminal after installation
+
+If dependencies fail:
+- Update pip: pip install --upgrade pip
+- Try: pip install --no-cache-dir -r requirements.txt
+- Use Python 3.8-3.11 (avoid 3.12+ for better compatibility)
+
+FEATURES AVAILABLE
+-----------------
+✅ FREE AI image generation (Bing Image Creator)
+✅ FREE voice synthesis (Microsoft Edge TTS)
+✅ Professional video compilation (MoviePy + FFmpeg)
+✅ 5 demo scripts included
+✅ Multiple quality options (480p, 720p, 1080p)
+✅ Real-time progress tracking
+✅ Modern web interface
+✅ One-click startup scripts
+
+EXAMPLE CUSTOM SCRIPT
+--------------------
+A magical unicorn appears in an enchanted forest.
+The unicorn's horn glows with rainbow colors.
+Forest animals gather around the majestic creature.
+The unicorn grants wishes to all the animals.
+Everyone lives happily in the magical forest.
+
+(Each line becomes one scene in your video!)
