@@ -10,6 +10,7 @@ import utils
 from modules.tts_module import TTSGenerator
 from modules.image_module import ImageGenerator
 from modules.video_module import VideoGenerator
+import demo_scripts
 
 def main():
     st.set_page_config(
@@ -26,6 +27,8 @@ def main():
         st.session_state.processing_complete = False
     if 'final_video_path' not in st.session_state:
         st.session_state.final_video_path = None
+    if 'scene_files' not in st.session_state:
+        st.session_state.scene_files = []
     
     # Create necessary directories
     utils.create_directories()
@@ -33,6 +36,16 @@ def main():
     # Sidebar for configuration
     with st.sidebar:
         st.header("⚙️ Configuration")
+        
+        # System status
+        st.subheader("🔧 System Status")
+        
+        # Check FFmpeg
+        if utils.check_ffmpeg():
+            st.success("✅ FFmpeg available")
+        else:
+            st.error("❌ FFmpeg not found")
+            st.info("Install FFmpeg for video processing")
 
         # Information about free image generation
         st.success("🆓 FREE AI Images: Using Bing Image Creator (DALL-E 3) - No API key needed!")
@@ -62,6 +75,24 @@ def main():
             max_value=10,
             value=config.DEFAULT_SCENE_DURATION
         )
+        
+        # Quality settings
+        video_quality = st.selectbox(
+            "Video Quality",
+            ["High (1080p)", "Medium (720p)", "Low (480p)"],
+            index=1
+        )
+        
+        # Update config based on quality selection
+        if video_quality == "High (1080p)":
+            config.VIDEO_RESOLUTION = (1920, 1080)
+            config.IMAGE_SIZE = (1920, 1080)
+        elif video_quality == "Medium (720p)":
+            config.VIDEO_RESOLUTION = (1280, 720)
+            config.IMAGE_SIZE = (1280, 720)
+        else:  # Low (480p)
+            config.VIDEO_RESOLUTION = (854, 480)
+            config.IMAGE_SIZE = (854, 480)
 
         # Show character usage if ElevenLabs is being used
         if elevenlabs_key and 'tts_generator' in st.session_state:
@@ -76,6 +107,12 @@ def main():
         if st.button("🗑️ Clear Temp Files"):
             utils.cleanup_temp_files()
             st.success("Temporary files cleared!")
+            
+        # Advanced settings
+        with st.expander("🔧 Advanced Settings"):
+            enable_subtitles = st.checkbox("Add Subtitles to Video", value=False)
+            enable_background_music = st.checkbox("Add Background Music", value=False)
+            batch_processing = st.checkbox("Batch Processing Mode", value=False)
 
         # Help section
         st.subheader("📚 Quick Help")
@@ -90,6 +127,7 @@ def main():
             - Keep lines descriptive but concise
             - Use visual, animated-style descriptions
             - Each line becomes one scene in your video
+            - Try different video quality settings based on your needs
             """)
     
     # Main content area
@@ -98,36 +136,26 @@ def main():
     with col1:
         st.header("📝 Script Input")
 
-        # Example scripts
-        example_scripts = {
-            "Fantasy Adventure": """A brave knight enters a mystical enchanted forest filled with glowing trees.
-The knight discovers a ancient treasure chest hidden beneath magical vines.
-Inside the chest lies a powerful sword that radiates golden light.
-The sword grants the knight the power to protect the innocent.
-The knight emerges from the forest as a legendary hero.""",
-
-            "Space Exploration": """A sleek spaceship approaches a mysterious alien planet with purple skies.
-The astronaut steps onto the planet's surface covered in crystal formations.
-Strange alien creatures with friendly eyes greet the visitor peacefully.
-The astronaut and aliens share knowledge about their different worlds.
-Together they build a bridge of friendship across the galaxy.""",
-
-            "Underwater Adventure": """A colorful submarine dives deep into the sparkling ocean depths.
-Schools of rainbow fish swim gracefully around coral reef gardens.
-A friendly dolphin guides the submarine to a hidden underwater city.
-The city is filled with mermaids and seahorse guardians dancing.
-The submarine returns to the surface with magical ocean treasures."""
-        }
-
-        selected_example = st.selectbox(
-            "Choose an example script or write your own:",
-            ["Custom Script"] + list(example_scripts.keys())
-        )
-
-        if selected_example != "Custom Script":
-            default_script = example_scripts[selected_example]
-        else:
-            default_script = ""
+        # Demo scripts section with enhanced variety
+        with st.expander("🎬 Try Demo Scripts", expanded=False):
+            st.markdown("**Choose from pre-made scripts to test the generator:**")
+            
+            demo_titles = demo_scripts.get_all_demo_titles()
+            selected_demo = st.selectbox(
+                "Select a demo script:",
+                [""] + demo_titles,
+                format_func=lambda x: "Choose a demo..." if x == "" else x
+            )
+            
+            if selected_demo and selected_demo != "":
+                st.info(f"**{selected_demo}:** {demo_scripts.get_demo_description(selected_demo)}")
+                if st.button("📋 Load Demo Script"):
+                    st.session_state.demo_script = demo_scripts.get_demo_script(selected_demo)
+                    st.success(f"✅ Loaded: {selected_demo}")
+                    st.rerun()
+        
+        # Get default script from session state if demo was loaded
+        default_script = st.session_state.get('demo_script', '')
 
         script_text = st.text_area(
             "Enter your script (one line = one scene):",
@@ -142,45 +170,61 @@ The submarine returns to the surface with magical ocean treasures."""
             total_chars = sum(len(line) for line in lines)
             estimated_duration = sum(utils.estimate_reading_time(line) for line in lines)
 
-            col_a, col_b, col_c = st.columns(3)
+            col_a, col_b, col_c, col_d = st.columns(4)
             with col_a:
                 st.metric("Scenes", len(lines))
             with col_b:
                 st.metric("Characters", total_chars)
             with col_c:
                 st.metric("Est. Duration", utils.format_duration(estimated_duration))
+            with col_d:
+                complexity = "Simple" if len(lines) <= 5 else "Medium" if len(lines) <= 10 else "Complex"
+                st.metric("Complexity", complexity)
 
-        if st.button("🚀 Generate Video", type="primary"):
-            if script_text.strip():
-                # Validate script
-                script_lines = [line.strip() for line in script_text.strip().split('\n') if line.strip()]
-
-                if len(script_lines) > 15:
-                    st.warning(f"⚠️ Large script detected ({len(script_lines)} scenes). This may take 5-10 minutes.")
-                    if not st.checkbox("✅ I understand this will take time to process", key="large_script_confirm"):
-                        st.info("💡 Tip: Try with fewer scenes first to test the system")
-                        return
-
-                # Estimate processing time
-                estimated_time = len(script_lines) * 20  # ~20 seconds per scene
-                if estimated_time > 300:  # 5 minutes
-                    st.warning(f"⏱️ Estimated processing time: {estimated_time//60} minutes")
-
-                generate_video(script_text, voice_provider, scene_duration)
-            else:
-                st.error("❌ Please enter a script!")
+        # Generation options
+        col_gen1, col_gen2 = st.columns(2)
+        
+        with col_gen1:
+            if st.button("🚀 Generate Video", type="primary"):
+                if script_text.strip():
+                    generate_video_workflow(script_text, voice_provider, scene_duration, video_quality)
+                else:
+                    st.error("❌ Please enter a script!")
+        
+        with col_gen2:
+            if st.button("🎬 Preview First Scene"):
+                if script_text.strip():
+                    preview_first_scene(script_text, voice_provider)
+                else:
+                    st.error("❌ Please enter a script!")
     
     with col2:
-        st.header("📊 Progress")
-        progress_placeholder = st.empty()
-        status_placeholder = st.empty()
+        st.header("📊 Progress & Results")
         
+        # Progress tracking
+        if 'current_progress' in st.session_state:
+            progress_bar = st.progress(st.session_state.current_progress)
+            status_text = st.text(st.session_state.get('current_status', 'Ready'))
+        
+        # Results section
         if st.session_state.processing_complete and st.session_state.final_video_path:
             st.success("✅ Video generation complete!")
             
             # Video preview
             if os.path.exists(st.session_state.final_video_path):
                 st.video(st.session_state.final_video_path)
+                
+                # Video info
+                try:
+                    video_info = utils.get_video_info(st.session_state.final_video_path)
+                    if video_info:
+                        col_info1, col_info2 = st.columns(2)
+                        with col_info1:
+                            st.metric("Duration", f"{video_info.get('duration', 0):.1f}s")
+                        with col_info2:
+                            st.metric("Size", f"{video_info.get('file_size', 0):.1f} MB")
+                except:
+                    pass
                 
                 # Download button
                 with open(st.session_state.final_video_path, "rb") as file:
@@ -190,9 +234,59 @@ The submarine returns to the surface with magical ocean treasures."""
                         file_name="animated_video.mp4",
                         mime="video/mp4"
                     )
+                
+                # Individual scene downloads
+                if st.session_state.scene_files:
+                    with st.expander("📁 Individual Scenes"):
+                        for i, scene_file in enumerate(st.session_state.scene_files):
+                            if os.path.exists(scene_file):
+                                scene_name = f"Scene {i+1}"
+                                with open(scene_file, "rb") as f:
+                                    st.download_button(
+                                        label=f"📥 {scene_name}",
+                                        data=f.read(),
+                                        file_name=f"scene_{i+1}.mp4",
+                                        mime="video/mp4",
+                                        key=f"download_scene_{i}"
+                                    )
 
-def generate_video(script_text: str, voice_provider: str, scene_duration: int):
-    """Generate video from script"""
+def preview_first_scene(script_text: str, voice_provider: str):
+    """Preview the first scene only"""
+    script_lines = utils.validate_script_lines(script_text.split('\n'))
+    if not script_lines:
+        st.error("No valid script lines found!")
+        return
+    
+    first_line = script_lines[0]
+    st.info(f"🎬 Previewing first scene: {first_line[:50]}...")
+    
+    # Initialize generators
+    tts_generator = TTSGenerator(use_elevenlabs=(voice_provider == "Auto (ElevenLabs → Edge TTS)"))
+    image_generator = ImageGenerator()
+    
+    try:
+        # Generate image for first scene
+        with st.spinner("🎨 Generating AI image..."):
+            image_path = image_generator.generate_image(first_line, 1)
+        
+        # Generate audio for first scene
+        with st.spinner("🎙️ Generating voice..."):
+            audio_path = tts_generator.generate_speech(first_line, 1)
+        
+        # Show preview
+        if os.path.exists(image_path):
+            st.image(image_path, caption="Generated Image")
+        
+        if os.path.exists(audio_path):
+            st.audio(audio_path, format="audio/mp3")
+        
+        st.success("✅ First scene preview complete!")
+        
+    except Exception as e:
+        st.error(f"❌ Preview failed: {str(e)}")
+
+def generate_video_workflow(script_text: str, voice_provider: str, scene_duration: int, video_quality: str):
+    """Enhanced video generation workflow with better error handling"""
     # Parse script lines
     script_lines = utils.validate_script_lines(script_text.split('\n'))
     
@@ -200,12 +294,22 @@ def generate_video(script_text: str, voice_provider: str, scene_duration: int):
         st.error("No valid script lines found!")
         return
     
+    # Validate script length
+    if len(script_lines) > 20:
+        st.warning(f"⚠️ Large script detected ({len(script_lines)} scenes). This may take 10-15 minutes.")
+        if not st.checkbox("✅ I understand this will take time to process"):
+            st.info("💡 Tip: Try with fewer scenes first to test the system")
+            return
+    
     st.info(f"Processing {len(script_lines)} scenes...")
     
     # Initialize generators
     tts_generator = TTSGenerator(use_elevenlabs=(voice_provider == "Auto (ElevenLabs → Edge TTS)"))
     image_generator = ImageGenerator()
     video_generator = VideoGenerator()
+    
+    # Store in session state
+    st.session_state.tts_generator = tts_generator
     
     progress_bar = st.progress(0)
     status_text = st.empty()
@@ -218,6 +322,10 @@ def generate_video(script_text: str, voice_provider: str, scene_duration: int):
 
         # Show processing statistics
         stats_container = st.container()
+        
+        # Processing timer
+        import time
+        start_time = time.time()
 
         for i, line in enumerate(script_lines):
             scene_num = i + 1
@@ -273,13 +381,20 @@ def generate_video(script_text: str, voice_provider: str, scene_duration: int):
 
                 # Update statistics
                 with stats_container:
-                    col1, col2, col3 = st.columns(3)
+                    elapsed_time = time.time() - start_time
+                    avg_time_per_scene = elapsed_time / scene_num if scene_num > 0 else 0
+                    remaining_scenes = len(script_lines) - scene_num
+                    estimated_remaining = remaining_scenes * avg_time_per_scene
+                    
+                    col1, col2, col3, col4 = st.columns(4)
                     with col1:
                         st.metric("Completed", len(scene_files))
                     with col2:
                         st.metric("Failed", len(failed_scenes))
                     with col3:
-                        st.metric("Remaining", len(script_lines) - scene_num)
+                        st.metric("Remaining", remaining_scenes)
+                    with col4:
+                        st.metric("Est. Time Left", f"{estimated_remaining/60:.1f}m")
 
             except Exception as scene_error:
                 st.error(f"❌ Critical error in scene {scene_num}: {str(scene_error)}")
@@ -298,6 +413,7 @@ def generate_video(script_text: str, voice_provider: str, scene_duration: int):
                 # Update session state
                 st.session_state.processing_complete = True
                 st.session_state.final_video_path = final_video_path
+                st.session_state.scene_files = scene_files
 
                 # Show final results
                 status_text.text("✅ Video generation complete!")
@@ -305,6 +421,7 @@ def generate_video(script_text: str, voice_provider: str, scene_duration: int):
                 # Success summary
                 success_count = len(scene_files)
                 total_count = len(script_lines)
+                total_time = time.time() - start_time
 
                 if failed_scenes:
                     st.warning(f"⚠️ Video completed with {success_count}/{total_count} scenes. Failed scenes: {failed_scenes}")
@@ -312,6 +429,7 @@ def generate_video(script_text: str, voice_provider: str, scene_duration: int):
                     st.success(f"🎉 Perfect! All {success_count} scenes completed successfully!")
 
                 st.success(f"📁 Video saved to: {final_video_path}")
+                st.info(f"⏱️ Total processing time: {total_time/60:.1f} minutes")
 
                 # Show processing statistics
                 if hasattr(video_generator, 'processing_stats'):
@@ -330,6 +448,10 @@ def generate_video(script_text: str, voice_provider: str, scene_duration: int):
         st.error(f"❌ Critical error during video generation: {str(e)}")
         st.exception(e)
         st.info("💡 Try with a shorter script or check your system resources")
+
+def generate_video(script_text: str, voice_provider: str, scene_duration: int):
+    """Legacy function - redirects to new workflow"""
+    generate_video_workflow(script_text, voice_provider, scene_duration, "Medium (720p)")
 
 if __name__ == "__main__":
     main()
