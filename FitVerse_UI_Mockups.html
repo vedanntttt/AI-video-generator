@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitVerse - UI Mockups</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .phone-container {
+            display: inline-block;
+            margin: 15px;
+            vertical-align: top;
+        }
+
+        .phone {
+            width: 280px;
+            height: 580px;
+            background: #000;
+            border-radius: 25px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .screen-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .header-icons {
+            font-size: 18px;
+        }
+
+        /* Home Screen Styles */
+        .greeting {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .greeting h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .streak {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .today-focus {
+            padding: 20px;
+        }
+
+        .focus-cards {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .focus-card {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+
+        .focus-card h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .focus-card p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .progress-section {
+            background: #f8f9fa;
+            margin: 0 20px;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            height: 8px;
+            border-radius: 4px;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            height: 100%;
+            border-radius: 4px;
+            width: 80%;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            padding: 0 20px;
+            margin-bottom: 15px;
+        }
+
+        .action-btn {
+            flex: 1;
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .achievements {
+            background: #fff3cd;
+            margin: 0 20px;
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 4px solid #FF9800;
+        }
+
+        /* Chat Interface Styles */
+        .chat-header {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-content {
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+        }
+
+        .ai-message {
+            background: #f1f3f4;
+            padding: 15px;
+            border-radius: 15px 15px 15px 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .user-message {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 15px;
+            border-radius: 15px 15px 5px 15px;
+            margin-bottom: 15px;
+            margin-left: 50px;
+            font-size: 14px;
+        }
+
+        .chat-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .chat-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .chat-input {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 14px;
+        }
+
+        .send-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        /* Workout Interface Styles */
+        .workout-header {
+            background: #FF9800;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exercise-progress {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            text-align: center;
+        }
+
+        .exercise-progress h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .exercise-details {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .exercise-details h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .exercise-details p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .exercise-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .exercise-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .sets-tracking {
+            padding: 0 20px;
+        }
+
+        .set-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tip-box {
+            background: #e3f2fd;
+            margin: 15px 20px;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .navigation-buttons {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        .nav-btn {
+            flex: 1;
+            background: #f8f9fa;
+            border: none;
+            padding: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .nav-btn.primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        /* Nutrition Dashboard Styles */
+        .nutrition-header {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calorie-section {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .calorie-count {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .macro-section {
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .macro-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .macro-bar {
+            flex: 1;
+            background: #e9ecef;
+            height: 6px;
+            border-radius: 3px;
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .macro-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .protein-fill { background: #FF9800; width: 80%; }
+        .carbs-fill { background: #2196F3; width: 60%; }
+        .fat-fill { background: #9C27B0; width: 70%; }
+
+        .meals-section {
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .meal-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .meal-checkbox {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .water-section {
+            background: #e3f2fd;
+            margin: 0 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Analytics Styles */
+        .analytics-header {
+            background: #2196F3;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .time-filters {
+            display: flex;
+            padding: 15px 20px;
+            gap: 5px;
+        }
+
+        .filter-btn {
+            flex: 1;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background: #2196F3;
+            color: white;
+        }
+
+        .chart-section {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chart-placeholder {
+            background: #f8f9fa;
+            height: 150px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-line {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #4CAF50;
+            transform: translateY(-50%);
+        }
+
+        .chart-line::before,
+        .chart-line::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #4CAF50;
+            border-radius: 50%;
+        }
+
+        .chart-line::before { left: 0; top: -2px; }
+        .chart-line::after { right: 0; top: -2px; }
+
+        .highlights {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .highlight-item {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+        }
+
+        .highlight-icon {
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .phone-container {
+                display: block;
+                margin: 15px auto;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+
+        /* Animation */
+        .phone {
+            transition: transform 0.3s ease;
+        }
+
+        .phone:hover {
+            transform: translateY(-5px);
+        }
+
+        .screen {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏃‍♂️ FitVerse - UI Mockups</h1>
+        
+        <!-- Home Screen -->
+        <div class="phone-container">
+            <div class="screen-title">📱 Home Dashboard</div>
+            <div class="phone">
+                <div class="screen">
+                    <div class="header">
+                        <span>☰ FitVerse</span>
+                        <div class="header-icons">🔔 👤</div>
+                    </div>
+                    
+                    <div class="greeting">
+                        <h2>Good Morning, Sarah! 🌟</h2>
+                        <div class="streak">You're on a 7-day streak!</div>
+                    </div>
+                    
+                    <div class="today-focus">
+                        <h3 style="margin-bottom: 15px; color: #333;">Today's Focus</h3>
+                        <div class="focus-cards">
+                            <div class="focus-card">
+                                <h3>💪 Workout</h3>
+                                <p>Upper Body</p>
+                                <p>45 min</p>
+                            </div>
+                            <div class="focus-card">
+                                <h3>🍎 Nutrition</h3>
+                                <p>1,847 cal</p>
+                                <p>remaining</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div style="font-weight: bold; margin-bottom: 10px;">Progress Snapshot</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div style="font-size: 12px; color: #666;">80% Weekly Goal</div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="action-btn">View Workout</button>
+                        <button class="action-btn">Meal Plan</button>
+                        <button class="action-btn">Coach</button>
+                    </div>
+                    
+                    <div class="achievements">
+                        <div style="font-weight: bold; margin-bottom: 5px;">🏆 New Badge: 7-Day Streak</div>
+                        <div style="font-size: 14px;">💎 1,247 points earned this week</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Interface -->
+        <div class="phone-container">
+            <div class="screen-title">💬 AI Coach Chat</div>
+            <div class="phone">
+                <div class="screen">
+                    <div class="chat-header">
+                        <span>← FitVerse AI Coach</span>
+                        <span>⚙️</span>
+                    </div>
+                    
+                    <div class="chat-content">
+                        <div class="ai-message">
+                            🤖 Hi Sarah! Ready for today's upper body workout? I've adjusted it based on yesterday's feedback. 💪
+                            
+                            <div class="chat-buttons">
+                                <button class="chat-btn">View Today's Workout</button>
+                                <button class="chat-btn">Adjust Difficulty</button>
+                                <button class="chat-btn">Get Motivation</button>
+                            </div>
+                        </div>
+                        
+                        <div class="user-message">
+                            Great! Show me the workout 💪
+                        </div>
+                        
+                        <div class="ai-message">
+                            🤖 Perfect! Here's your customized 45-minute upper body session...
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input">
+                        <input type="text" placeholder="Type a message...">
+                        <button class="send-btn">></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workout Interface -->
+        <div class="phone-container">
+            <div class="screen-title">💪 Workout Screen</div>
+            <div class="phone">
+                <div class="screen">
+                    <div class="workout-header">
+                        <span>← Upper Body Workout</span>
+                        <span>⏱️ 45m</span>
+                    </div>
+                    
+                    <div class="exercise-progress">
+                        <h3>Exercise 2 of 8</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 25%;"></div>
+                        </div>
+                        <div>25% Complete</div>
+                    </div>
+                    
+                    <div class="exercise-details">
+                        <h2>💪 Push-ups</h2>
+                        <p>3 sets × 12 reps</p>
+                        
+                        <div class="exercise-buttons">
+                            <button class="exercise-btn">📹 Watch Demo</button>
+                            <button class="exercise-btn">📝 Log Reps</button>
+                        </div>
+                    </div>
+                    
+                    <div class="sets-tracking">
+                        <div class="set-row">
+                            <span>Set 1:</span>
+                            <span>☑️ 12 reps</span>
+                            <span>⭐⭐⭐⭐⭐</span>
+                        </div>
+                        <div class="set-row">
+                            <span>Set 2:</span>
+                            <span>⏹️ __ reps</span>
+                            <span>Rate difficulty</span>
+                        </div>
+                        <div class="set-row">
+                            <span>Set 3:</span>
+                            <span>⏹️ __ reps</span>
+                            <span></span>
+                        </div>
+                    </div>
+                    
+                    <div class="tip-box">
+                        💡 <strong>Tip:</strong> Keep your core engaged throughout the movement
+                    </div>
+                    
+                    <div class="navigation-buttons">
+                        <button class="nav-btn">Previous</button>
+                        <button class="nav-btn">Skip</button>
+                        <button class="nav-btn primary">Complete Set</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nutrition Dashboard -->
+        <div class="phone-container">
+            <div class="screen-title">🍎 Nutrition Dashboard</div>
+            <div class="phone">
+                <div class="screen">
+                    <div class="nutrition-header">
+                        <span>← Today's Nutrition</span>
+                        <span>📅</span>
+                    </div>
+                    
+                    <div class="calorie-section">
+                        <div class="calorie-count">1,247 / 2,100</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 59%;"></div>
+                        </div>
+                        <div style="font-size: 14px; color: #666;">59% of daily goal</div>
+                    </div>
+                    
+                    <div class="macro-section">
+                        <h3 style="margin-bottom: 15px;">Macros</h3>
+                        <div class="macro-row">
+                            <span>Protein</span>
+                            <div class="macro-bar">
+                                <div class="macro-fill protein-fill"></div>
+                            </div>
+                            <span>80% (120g)</span>
+                        </div>
+                        <div class="macro-row">
+                            <span>Carbs</span>
+                            <div class="macro-bar">
+                                <div class="macro-fill carbs-fill"></div>
+                            </div>
+                            <span>60% (180g)</span>
+                        </div>
+                        <div class="macro-row">
+                            <span>Fat</span>
+                            <div class="macro-bar">
+                                <div class="macro-fill fat-fill"></div>
+                            </div>
+                            <span>70% (65g)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="meals-section">
+                        <h3 style="margin-bottom: 15px;">Today's Meals</h3>
+                        <div class="meal-item">
+                            <span class="meal-checkbox">☑️</span>
+                            <span>Breakfast: Oatmeal Bowl</span>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-checkbox">☑️</span>
+                            <span>Snack: Greek Yogurt</span>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-checkbox">⏹️</span>
+                            <span>Lunch: Chicken Salad</span>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-checkbox">⏹️</span>
+                            <span>Dinner: Salmon & Vegetables</span>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions" style="margin-bottom: 15px;">
+                        <button class="action-btn">View Meal Plan</button>
+                        <button class="action-btn">Log Food</button>
+                        <button class="action-btn">Recipes</button>
+                    </div>
+                    
+                    <div class="water-section">
+                        <div>
+                            <div>💧 Water: 6/8 glasses</div>
+                            <div class="progress-bar" style="width: 120px; margin: 5px 0;">
+                                <div class="progress-fill" style="width: 75%;"></div>
+                            </div>
+                        </div>
+                        <button class="action-btn" style="padding: 8px 12px;">Add Glass</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Analytics -->
+        <div class="phone-container">
+            <div class="screen-title">📊 Progress Analytics</div>
+            <div class="phone">
+                <div class="screen">
+                    <div class="analytics-header">
+                        <h2>Progress Analytics</h2>
+                    </div>
+                    
+                    <div class="time-filters">
+                        <button class="filter-btn active">Week</button>
+                        <button class="filter-btn">Month</button>
+                        <button class="filter-btn">3 Months</button>
+                        <button class="filter-btn">Year</button>
+                    </div>
+                    
+                    <div class="chart-section">
+                        <h3 style="margin-bottom: 15px;">Weight Progress</h3>
+                        <div class="chart-placeholder">
+                            <div class="chart-line"></div>
+                            <div style="position: absolute; left: 20px; top: 20px; font-size: 12px; color: #666;">165 lbs</div>
+                            <div style="position: absolute; right: 20px; bottom: 20px; font-size: 12px; color: #666;">160 lbs</div>
+                        </div>
+                        <div style="font-size: 12px; color: #666;">Jan - Feb - Mar - Apr - May</div>
+                    </div>
+                    
+                    <div class="highlights">
+                        <h3 style="margin-bottom: 15px;">This Week's Highlights</h3>
+                        <div class="highlight-item">
+                            <span class="highlight-icon">🏆</span>
+                            <span>5/7 workouts completed</span>
+                        </div>
+                        <div class="highlight-item">
+                            <span class="highlight-icon">📈</span>
+                            <span>2 lbs lost</span>
+                        </div>
+                        <div class="highlight-item">
+                            <span class="highlight-icon">🔥</span>
+                            <span>7-day nutrition streak</span>
+                        </div>
+                        <div class="highlight-item">
+                            <span class="highlight-icon">⭐</span>
+                            <span>847 points earned</span>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="action-btn">Detailed View</button>
+                        <button class="action-btn">Export Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
