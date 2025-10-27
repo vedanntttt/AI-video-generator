@@ -3,6 +3,7 @@ Utility functions for the AI Animated Video Generator
 """
 import os
 import shutil
+import subprocess
 from typing import List
 import config
 
@@ -49,3 +50,80 @@ def format_duration(seconds: float) -> str:
     minutes = int(seconds // 60)
     seconds = int(seconds % 60)
     return f"{minutes:02d}:{seconds:02d}"
+
+def check_ffmpeg() -> bool:
+    """Check if FFmpeg is available on the system"""
+    try:
+        subprocess.run(['ffmpeg', '-version'], capture_output=True, check=True)
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
+
+def get_file_size(file_path: str) -> float:
+    """Get file size in MB"""
+    try:
+        size_bytes = os.path.getsize(file_path)
+        return size_bytes / (1024 * 1024)  # Convert to MB
+    except OSError:
+        return 0.0
+
+def get_video_info(video_path: str) -> dict:
+    """Get basic video information"""
+    try:
+        from moviepy.editor import VideoFileClip
+        
+        with VideoFileClip(video_path) as clip:
+            return {
+                'duration': clip.duration,
+                'fps': clip.fps,
+                'size': clip.size,
+                'has_audio': clip.audio is not None,
+                'file_size': get_file_size(video_path)
+            }
+    except Exception:
+        return {
+            'file_size': get_file_size(video_path)
+        }
+
+def sanitize_filename(filename: str) -> str:
+    """Sanitize filename for cross-platform compatibility"""
+    import re
+    # Remove or replace invalid characters
+    sanitized = re.sub(r'[<>:"/\\|?*]', '_', filename)
+    # Limit length
+    if len(sanitized) > 100:
+        sanitized = sanitized[:100]
+    return sanitized
+
+def ensure_audio_format(audio_path: str, target_format: str = "mp3") -> str:
+    """Ensure audio file is in the correct format"""
+    if not audio_path.endswith(f".{target_format}"):
+        # Convert using FFmpeg if needed
+        try:
+            new_path = audio_path.rsplit('.', 1)[0] + f".{target_format}"
+            subprocess.run([
+                'ffmpeg', '-i', audio_path, '-y', new_path
+            ], capture_output=True, check=True)
+            return new_path
+        except subprocess.CalledProcessError:
+            return audio_path  # Return original if conversion fails
+    return audio_path
+
+def create_backup(file_path: str) -> str:
+    """Create a backup of a file"""
+    if os.path.exists(file_path):
+        backup_path = f"{file_path}.backup"
+        shutil.copy2(file_path, backup_path)
+        return backup_path
+    return ""
+
+def count_files_in_directory(directory: str, extension: str = None) -> int:
+    """Count files in a directory, optionally filtered by extension"""
+    if not os.path.exists(directory):
+        return 0
+    
+    files = os.listdir(directory)
+    if extension:
+        files = [f for f in files if f.endswith(extension)]
+    
+    return len(files)

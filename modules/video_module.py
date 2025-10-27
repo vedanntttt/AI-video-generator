@@ -5,7 +5,7 @@ Handles creation of individual scene videos and final video concatenation using 
 import os
 import time
 from typing import List
-from moviepy import (
+from moviepy.editor import (
     ImageClip, AudioFileClip, CompositeVideoClip,
     concatenate_videoclips, TextClip, CompositeAudioClip,
     VideoFileClip, ColorClip
@@ -22,8 +22,6 @@ class VideoGenerator:
 
         # Verify system capabilities
         try:
-            from moviepy.config import check_for_imageio_ffmpeg
-            check_for_imageio_ffmpeg()
             st.success("🎬 Optimized Video Generator Ready!")
         except Exception as e:
             st.warning(f"⚠️ FFmpeg optimization unavailable: {str(e)}")
@@ -57,7 +55,7 @@ class VideoGenerator:
             final_video_clip = image_clip
 
             # Combine with audio
-            final_clip = final_video_clip.with_audio(audio_clip)
+            final_clip = final_video_clip.set_audio(audio_clip)
 
             # Write video file with balanced quality and speed settings
             final_clip.write_videofile(
@@ -66,7 +64,9 @@ class VideoGenerator:
                 preset='medium',  # Better quality than ultrafast
                 codec='libx264',
                 bitrate='1500k',  # Higher bitrate for better quality
-                threads=4
+                threads=4,
+                verbose=False,
+                logger=None
             )
 
             # Clean up clips
@@ -159,7 +159,7 @@ class VideoGenerator:
             new_width = int(target_height * original_ratio)
 
         # Resize and center
-        resized_clip = image_clip.resized((new_width, new_height))
+        resized_clip = image_clip.resize((new_width, new_height))
 
         # If the resized image doesn't fill the target, add black bars
         if new_width != target_width or new_height != target_height:
@@ -168,7 +168,7 @@ class VideoGenerator:
             # Center the resized image on the black background
             resized_clip = CompositeVideoClip([
                 black_bg,
-                resized_clip.with_position('center')
+                resized_clip.set_position('center')
             ])
 
         return resized_clip
@@ -179,18 +179,19 @@ class VideoGenerator:
             # Wrap text to fit screen width (approximate)
             wrapped_text = self._wrap_subtitle_text(text, max_chars_per_line=50)
 
-            # Create text clip with MoviePy 2.x compatible parameters
+            # Create text clip with MoviePy compatible parameters
             subtitle = TextClip(
-                text=wrapped_text,
-                font_size=28,  # Slightly smaller for wrapped text
+                wrapped_text,
+                fontsize=28,  # Slightly smaller for wrapped text
                 color='white',
                 font='Arial',
                 stroke_color='black',
-                stroke_width=2
-            ).with_duration(duration)
+                stroke_width=2,
+                duration=duration
+            )
 
             # Position at bottom center with margin
-            subtitle = subtitle.with_position(('center', 0.85))  # 85% down from top
+            subtitle = subtitle.set_position(('center', 0.85))  # 85% down from top
 
             return subtitle
 
@@ -201,10 +202,11 @@ class VideoGenerator:
                 # Try with wrapped text but simpler formatting
                 wrapped_text = self._wrap_subtitle_text(text, max_chars_per_line=40)
                 return TextClip(
-                    text=wrapped_text,
-                    font_size=24,
-                    color='white'
-                ).with_duration(duration).with_position('center')
+                    wrapped_text,
+                    fontsize=24,
+                    color='white',
+                    duration=duration
+                ).set_position('center')
             except Exception as e2:
                 # Last resort - no subtitles
                 st.warning(f"Could not create subtitles: {str(e2)}")
@@ -269,7 +271,9 @@ class VideoGenerator:
                 preset='medium',  # Better quality
                 codec='libx264',
                 bitrate='2000k',  # Higher bitrate for final video
-                threads=4
+                threads=4,
+                verbose=False,
+                logger=None
             )
             
             # Clean up clips
@@ -304,8 +308,9 @@ class VideoGenerator:
                 fontsize=60,
                 color='white',
                 font='Arial-Bold',
-                size=config.VIDEO_RESOLUTION
-            ).set_duration(duration)
+                size=config.VIDEO_RESOLUTION,
+                duration=duration
+            )
             
             # Create background
             bg_clip = ColorClip(
@@ -340,8 +345,6 @@ class VideoGenerator:
     def get_video_info(self, video_path: str) -> dict:
         """Get information about a video file"""
         try:
-            from moviepy.editor import VideoFileClip
-            
             with VideoFileClip(video_path) as clip:
                 return {
                     'duration': clip.duration,
